@@ -1,0 +1,11 @@
+# .NET Core build folders
+.vs/
+bin/
+obj/
+
+# Local configuration files
+appsettings.Development.json
+
+# Others
+*.user
+*.log
