@@ -6,6 +6,10 @@ obj/
 # Local configuration files
 appsettings.Development.json
 
+# Local database
+Migrations/
+Pizzas.db
+
 # Others
 *.user
 *.log
