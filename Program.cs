@@ -15,6 +15,18 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "PizzaStore API", Description = "Making the Pizzas you love", Version = "v1" });
 });
 
+string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+      builder =>
+      {
+          builder.WithOrigins(
+            "http://example.com", "*");
+      });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -26,17 +38,19 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseCors(MyAllowSpecificOrigins);
+
 app.MapGet("/", () => "Hello World!");
 
 app.MapGet("/pizzas", async (PizzaDB db) => await db.Pizzas.ToListAsync());
-app.MapPost("/pizza", async (PizzaDB db, Pizza pizza) =>
+app.MapPost("/pizzas", async (PizzaDB db, Pizza pizza) =>
 {
     await db.Pizzas.AddAsync(pizza);
     await db.SaveChangesAsync();
     return Results.Created($"/pizza/{pizza.Id}", pizza);
 });
-app.MapGet("/pizza/{id}", async (PizzaDB db, int id) => await db.Pizzas.FindAsync(id));
-app.MapPut("/pizza/{id}", async (PizzaDB db, Pizza updatepizza, int id) =>
+app.MapGet("/pizzas/{id}", async (PizzaDB db, int id) => await db.Pizzas.FindAsync(id));
+app.MapPut("/pizzas/{id}", async (PizzaDB db, Pizza updatepizza, int id) =>
 {
     var pizza = await db.Pizzas.FindAsync(id);
     if (pizza is null) return Results.NotFound();
@@ -45,7 +59,7 @@ app.MapPut("/pizza/{id}", async (PizzaDB db, Pizza updatepizza, int id) =>
     await db.SaveChangesAsync();
     return Results.NoContent();
 });
-app.MapDelete("/pizza/{id}", async (PizzaDB db, int id) =>
+app.MapDelete("/pizzas/{id}", async (PizzaDB db, int id) =>
 {
     var pizza = await db.Pizzas.FindAsync(id);
     if (pizza is null)
